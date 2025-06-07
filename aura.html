@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraStyle - Fashion Visual Search</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: #2c3e50;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav a.active {
+            color: #4ecdc4;
+        }
+
+        .nav a:hover {
+            background: rgba(78, 205, 196, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .container {
+            display: flex;
+            max-width: 1400px;
+            margin: 2rem auto;
+            gap: 2rem;
+            padding: 0 2rem;
+        }
+
+        .upload-section {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .upload-section:hover {
+            transform: translateY(-5px);
+        }
+
+        .upload-area {
+            border: 3px dashed #4ecdc4;
+            border-radius: 15px;
+            padding: 4rem 2rem;
+            background: linear-gradient(145deg, #f8f9ff, #e8f4f8);
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(78, 205, 196, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.5s ease;
+            opacity: 0;
+        }
+
+        .upload-area:hover::before {
+            opacity: 1;
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background: linear-gradient(145deg, #f0f4ff, #e0f0f4);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            box-shadow: 0 5px 20px rgba(78, 205, 196, 0.3);
+        }
+
+        .upload-icon::before {
+            content: '↑';
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .upload-text {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-subtext {
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        .camera-button {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0 auto;
+            box-shadow: 0 5px 20px rgba(78, 205, 196, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .camera-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(78, 205, 196, 0.4);
+        }
+
+        .camera-button::before {
+            content: '📷';
+            font-size: 1.2rem;
+        }
+
+        .filters-section {
+            width: 350px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .filters-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .filter-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-label {
+            display: block;
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .filter-select, .filter-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:focus, .filter-input:focus {
+            outline: none;
+            border-color: #4ecdc4;
+            box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
+        }
+
+        .price-slider {
+            margin: 1rem 0;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: linear-gradient(to right, #4ecdc4, #667eea);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .price-range {
+            display: flex;
+            justify-content: space-between;
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .apply-button {
+            width: 100%;
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            box-shadow: 0 5px 20px rgba(78, 205, 196, 0.3);
+        }
+
+        .apply-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(78, 205, 196, 0.4);
+        }
+
+        .results-section {
+            display: none;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+            padding: 0 2rem;
+        }
+
+        .product-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 1px solid #eee;
+        }
+
+        .product-info {
+            padding: 1rem;
+        }
+
+        .product-brand {
+            color: #4ecdc4;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .product-name {
+            color: #2c3e50;
+            font-weight: 600;
+            margin: 0.5rem 0;
+            font-size: 0.95rem;
+        }
+
+        .product-price {
+            color: #667eea;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            color: white;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .filters-section {
+                width: 100%;
+                position: static;
+            }
+            
+            .nav {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">AuraStyle</div>
+        <nav>
+            <ul class="nav">
+                <li><a href="#" class="active">Visual Search</a></li>
+                <li><a href="#">Outfit Studio</a></li>
+                <li><a href="#">Dashboard</a></li>
+                <li><a href="#">Tech Insights</a></li>
+                <li><a href="#">Style Quiz</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="upload-section">
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon"></div>
+                <div class="upload-text">Drag & drop an image here</div>
+                <div class="upload-subtext">or click to browse</div>
+                <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleFileUpload(event)">
+            </div>
+            <button class="camera-button" onclick="openCamera()">Tap for camera (mobile)</button>
+        </div>
+
+        <div class="filters-section">
+            <h2 class="filters-title">Refine Your Search</h2>
+            
+            <div class="filter-group">
+                <label class="filter-label">Category</label>
+                <select class="filter-select" id="categoryFilter">
+                    <option value="">All Categories</option>
+                    <option value="tops">Tops</option>
+                    <option value="bottoms">Bottoms</option>
+                    <option value="dresses">Dresses</option>
+                    <option value="shoes">Shoes</option>
+                    <option value="accessories">Accessories</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label">Price Range (INR)</label>
+                <div class="price-slider">
+                    <input type="range" class="slider" id="priceRange" min="10000" max="500000" value="250000">
+                    <div class="price-range">
+                        <span>₹10,000</span>
+                        <span id="priceValue">₹2,50,000</span>
+                        <span>₹5,00,000</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label">Brand</label>
+                <input type="text" class="filter-input" id="brandFilter" placeholder="e.g., Ralph Lauren, BHLDN">
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label">Color</label>
+                <input type="text" class="filter-input" id="colorFilter" placeholder="e.g., Black, Navy, White">
+            </div>
+
+            <button class="apply-button" onclick="applyFilters()">Apply Filters</button>
+        </div>
+    </div>
+
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <div>Finding similar products...</div>
+    </div>
+
+    <div class="results-section" id="results"></div>
+
+    <script>
+        // Real fashion dataset
+        const fashionData = [
+            {
+                id: "479495",
+                name: "Kristian Silk Tuxedo Dress",
+                brand: "RALPH LAUREN",
+                price: Math.round(474848.9539),
+                originalPrice: Math.round(474848.9539),
+                category: "dresses",
+                color: "black",
+                image: "https://gallery.stylumia.com/originals/2020/02/14/b613d7b5dfe86f3e695d931d31fd729fdf44e181f14079d3d8ca9082e8414683.jpg",
+                description: "The Kristian evening dress is informed by the tuxedo-inspired gown Mr Lauren custom-designed for Rosie Huntington-Whiteley for our 50th anniversary runway show in Central Park. Transforming a timeless pillar of menswear into the ultimate in feminine elegance, this American-made dress is realised in silk cady and distinguished by formal suiting details, such as silk-satin-covered peak lapels and buttons.",
+                features: ["Slim fit", "Peak lapels", "Double-breasted silhouette", "Silk-covered buttons", "100% silk", "Made in USA"],
+                pdpUrl: "https://www.ralphlauren.co.uk/en/kristian-silk-tuxedo-dress-479495.html",
+                images: [
+                    "https://gallery.stylumia.com/originals/2020/02/14/b613d7b5dfe86f3e695d931d31fd729fdf44e181f14079d3d8ca9082e8414683_1.jpg",
+                    "https://gallery.stylumia.com/originals/2020/02/14/b613d7b5dfe86f3e695d931d31fd729fdf44e181f14079d3d8ca9082e8414683_2.jpg",
+                    "https://gallery.stylumia.com/originals/2020/02/14/b613d7b5dfe86f3e695d931d31fd729fdf44e181f14079d3d8ca9082e8414683_3.jpg"
+                ]
+            },
+            {
+                id: "502670",
+                name: "Kristian Silk Tuxedo Dress",
+                brand: "RALPH LAUREN",
+                price: Math.round(464648.6919),
+                originalPrice: Math.round(464648.6919),
+                category: "dresses",
+                color: "navy",
+                image: "https://gallery.stylumia.com/originals/2020/02/14/482b10a23f8d00cfc7c9bbeeac4e26d25dd303d8e62e97ba5ba74653f80ca72e.jpg",
+                description: "The Kristian evening dress is informed by the tuxedo-inspired gown Mr Lauren custom-designed for Rosie Huntington-Whiteley for our 50th anniversary runway show in Central Park. Transforming a timeless pillar of menswear into the ultimate in feminine elegance, this American-made dress is realised in silk cady and distinguished by formal suiting details, such as silk-satin-covered peak lapels and buttons.",
+                features: ["Slim fit", "Peak lapels", "Double-breasted silhouette", "Silk-covered buttons", "100% silk", "Made in USA"],
+                pdpUrl: "https://www.ralphlauren.co.uk/en/kristian-silk-tuxedo-dress-502670.html",
+                images: [
+                    "https://gallery.stylumia.com/originals/2020/02/14/482b10a23f8d00cfc7c9bbeeac4e26d25dd303d8e62e97ba5ba74653f80ca72e_1.jpg",
+                    "https://gallery.stylumia.com/originals/2020/02/14/482b10a23f8d00cfc7c9bbeeac4e26d25dd303d8e62e97ba5ba74653f80ca72e_2.jpg",
+                    "https://gallery.stylumia.com/originals/2020/02/14/482b10a23f8d00cfc7c9bbeeac4e26d25dd303d8e62e97ba5ba74653f80ca72e_3.jpg"
+                ]
+            },
+            {
+                id: "478766",
+                name: "Fit-and-Flare Shirtdress",
+                brand: "RALPH LAUREN",
+                price: Math.round(29496.0812),
+                originalPrice: Math.round(29496.0812),
+                category: "dresses",
+                color: "navy",
+                image: "https://gallery.stylumia.com/originals/2020/02/14/3508b052ef7a5eea820423b97713612bc92a3f2301a3d342f44b5cec1fe013ef.jpg",
+                description: "Airy georgette and a flattering fit-and-flare silhouette bring the shirtdress into chic new territory.",
+                features: ["Fit-and-flare silhouette", "Point collar", "Buttoned placket", "Long sleeves", "Self-belt", "Machine washable"],
+                pdpUrl: "https://www.ralphlauren.co.uk/en/fit-and-flare-shirtdress-478766.html",
+                images: [
+                    "https://gallery.stylumia.com/originals/2020/02/14/3508b052ef7a5eea820423b97713612bc92a3f2301a3d342f44b5cec1fe013ef_1.jpg",
+                    "https://gallery.stylumia.com/originals/2020/02/14/3508b052ef7a5eea820423b97713612bc92a3f2301a3d342f44b5cec1fe013ef_2.jpg",
+                    "https://gallery.stylumia.com/originals/2020/02/14/3508b052ef7a5eea820423b97713612bc92a3f2301a3d342f44b5cec1fe013ef_3.jpg"
+                ]
+            },
+            {
+                id: "50297209_041",
+                name: "Adena Crepe Dress",
+                brand: "BHLDN",
+                price: Math.round(17156.9392),
+                originalPrice: Math.round(17156.9392),
+                category: "dresses",
+                color: "black",
+                image: "https://gallery.stylumia.com/originals/2020/05/48/6360245240b68885bd4dbcef8d8856c0fb13f1314769f5273904a6eac26fb452.jpg",
+                description: "A sleek square neckline tops this stretchy, body-hugging number. Complete with a deep slit, it's sure to turn heads. Only available at BHLDN",
+                features: ["Square neckline", "Body-hugging fit", "Deep slit", "Back zip", "Polyester", "Professionally clean"],
+                pdpUrl: "https://www.anthropologie.com/shop/adena-crepe-dress2?color=041",
+                images: [
+                    "https://gallery.stylumia.com/originals/2020/05/48/6360245240b68885bd4dbcef8d8856c0fb13f1314769f5273904a6eac26fb452_1.jpg",
+                    "https://gallery.stylumia.com/originals/2020/05/48/6360245240b68885bd4dbcef8d8856c0fb13f1314769f5273904a6eac26fb452_2.jpg",
+                    "https://gallery.stylumia.com/originals/2020/05/48/6360245240b68885bd4dbcef8d8856c0fb13f1314769f5273904a6eac26fb452_3.jpg"
+                ]
+            }
+        ];
+
+        // Update price display with proper formatting
+        document.getElementById('priceRange').oninput = function() {
+            const value = parseInt(this.value);
+            const formattedValue = value.toLocaleString('en-IN');
+            document.getElementById('priceValue').textContent = '₹' + formattedValue;
+        };
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                simulateImageSearch();
+            }
+        }
+
+        function openCamera() {
+            // Simulate camera functionality
+            alert('Camera functionality would open here on mobile devices');
+            setTimeout(simulateImageSearch, 500);
+        }
+
+        function simulateImageSearch() {
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            
+            // Simulate AI processing time
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                displayResults(fashionData);
+            }, 2000);
+        }
+
+        function applyFilters() {
+            const category = document.getElementById('categoryFilter').value.toLowerCase();
+            const maxPrice = parseInt(document.getElementById('priceRange').value);
+            const brand = document.getElementById('brandFilter').value.toLowerCase();
+            const color = document.getElementById('colorFilter').value.toLowerCase();
+
+            let filteredData = fashionData.filter(item => {
+                const matchesCategory = !category || item.category === category;
+                const matchesPrice = item.price <= maxPrice;
+                const matchesBrand = !brand || item.brand.toLowerCase().includes(brand);
+                const matchesColor = !color || item.color.toLowerCase().includes(color);
+                
+                return matchesCategory && matchesPrice && matchesBrand && matchesColor;
+            });
+
+            displayResults(filteredData);
+        }
+
+        function displayResults(products) {
+            const resultsSection = document.getElementById('results');
+            resultsSection.style.display = 'grid';
+            
+            if (products.length === 0) {
+                resultsSection.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: white; padding: 2rem;">No products found matching your criteria.</div>';
+                return;
+            }
+
+            resultsSection.innerHTML = products.map(product => `
+                <div class="product-card" onclick="selectProduct('${product.id}')">
+                    <img src="${product.image}" alt="${product.name}" class="product-image" 
+                         onerror="this.src='https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=300&h=400&fit=crop'"
+                         loading="lazy">
+                    <div class="product-info">
+                        <div class="product-brand">${product.brand}</div>
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-price">₹${product.price.toLocaleString('en-IN')}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectProduct(productId) {
+            const product = fashionData.find(p => p.id === productId);
+            if (product) {
+                // Create detailed product modal/popup
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                    background: rgba(0,0,0,0.8); z-index: 1000; display: flex; 
+                    align-items: center; justify-content: center; padding: 2rem;
+                `;
+                
+                modal.innerHTML = `
+                    <div style="background: white; border-radius: 20px; max-width: 600px; width: 100%; max-height: 80vh; overflow-y: auto; position: relative;">
+                        <button onclick="this.closest('.modal').remove()" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; z-index: 1001;">×</button>
+                        <img src="${product.image}" style="width: 100%; height: 300px; object-fit: cover; border-radius: 20px 20px 0 0;">
+                        <div style="padding: 2rem;">
+                            <div style="color: #4ecdc4; font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">${product.brand}</div>
+                            <h2 style="color: #2c3e50; margin: 0.5rem 0;">${product.name}</h2>
+                            <div style="color: #667eea; font-size: 1.3rem; font-weight: bold; margin-bottom: 1rem;">₹${product.price.toLocaleString('en-IN')}</div>
+                            <p style="color: #666; line-height: 1.6; margin-bottom: 1rem;">${product.description}</p>
+                            <div style="margin-bottom: 1rem;">
+                                <strong style="color: #2c3e50;">Key Features:</strong>
+                                <ul style="margin: 0.5rem 0; padding-left: 1.5rem; color: #666;">
+                                    ${product.features.map(feature => `<li>${feature}</li>`).join('')}
+                                </ul>
+                            </div>
+                            <a href="${product.pdpUrl}" target="_blank" style="display: inline-block; background: linear-gradient(45deg, #4ecdc4, #44a08d); color: white; text-decoration: none; padding: 0.75rem 1.5rem; border-radius: 10px; font-weight: 600;">View on Store</a>
+                        </div>
+                    </div>
+                `;
+                
+                modal.className = 'modal';
+                document.body.appendChild(modal);
+                
+                modal.onclick = (e) => {
+                    if (e.target === modal) modal.remove();
+                };
+            }
+        }
+
+        // Initialize with some results
+        setTimeout(() => {
+            displayResults(fashionData);
+        }, 1000);
+    </script>
+</body>
+</html>
